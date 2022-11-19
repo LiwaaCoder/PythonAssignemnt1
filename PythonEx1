@@ -1,0 +1,118 @@
+import re
+
+## q1
+##A
+# <R>: : - <C>|<P>|<C>S|<P>S
+#<P>: :- EEF|EFE|E<P>EF|EE<P>F|EEF<P>|<P>EEF|<P>EFE|E<P>FE|EF<P>E|EFE<P>
+#<C>: :- EF|E<C>F|EF<C>|<C>EF
+
+##B
+#<P> = EEF|EFE|EEEEFF|EEEFFE|EEFFEE|EFFEEE|EFEEEF|EFEEFE|EFEFEE|EEFEEF|
+#EEFEFE|EEEFEF
+#<C> = EF|EEFF|EFEF|EFFE
+
+### q2
+def bfsReachable(graph, initial):
+    visited = set()
+    queue = [initial]
+
+    while queue:
+
+        node = queue.pop(0)
+        if node not in visited:
+
+            visited.add(node)
+            neighbours = graph[node]
+
+            for neighbour in neighbours:
+                queue.append(neighbour)
+    return sorted(list(visited))
+
+
+def dfsReachable(graph, initial):
+    visited = set()
+    dfs(visited, graph, initial)
+
+    return sorted(list(visited))
+
+
+def dfs(visited, graph, node):
+    if node not in visited:
+        visited.add(node)
+        for neighbour in graph[node]:
+            dfs(visited, graph, neighbour)
+
+
+graph = {
+    'a': ['b', 'c'],
+    'b': ['d'],
+    'c': [],
+    'd': ['a'],
+    'e': ['d']
+}
+
+#print("this print from DFS ", dfsReachable(graph, 'a'))
+#print("this print from BFS ", bfsReachable(graph, 'a'))
+
+file_path =r'C:\Users\lewa hosh\Downloads\movies.txt'
+
+
+def readMovie(filename):
+    actor_dict = {}
+    with open(filename,"r") as f:
+        lines = f.readlines()
+        for line in lines:
+            l = line.split(',')
+            l[len(l)-1] = l[len(l)-1].replace('\n','')
+            actor_dict[l[0]] = (l[1:])
+    return actor_dict
+
+
+
+def playWith(actor):
+    actor_dict = readMovie(file_path)
+    played_with = []
+    for movie in actor_dict[actor]:
+        for other in actor_dict:
+            if other == actor:
+                continue
+            if movie in actor_dict[other]:
+                played_with.append((other, movie))
+    return played_with
+
+
+
+def find(pattern):
+    str=""
+    actors = []
+    movies = []
+    dict = readMovie(file_path)
+    reg = re.compile(pattern)
+    print('Actors:')
+    for key in dict:
+        res = reg.findall(key)
+        if len(res) > 0:
+            actors.append(key)
+            print(f'\t{key}')
+    print('Movies:')
+    for key in dict:
+        for val in dict[key]:
+            res = reg.findall(val)
+            if len(res) > 0:
+                if val not in movies:
+                     movies.append(val)
+                     print(f'\t{val}')
+    return str
+
+
+
+print(readMovie(file_path))
+
+print(playWith('Anthony Hopkins'))
+print(find(r'\b[a-zA-Z]{10}\b'))
+
+
+
+
+
+
